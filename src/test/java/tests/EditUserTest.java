@@ -38,11 +38,8 @@ public class EditUserTest extends BaseTest {
                 .firstName(newFirstName)
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(userForBody)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userForBody)
                 .patch("?rest_route=/wp/v2/users/%s".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -59,11 +56,8 @@ public class EditUserTest extends BaseTest {
                 .email(newEmail)
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(userForBody)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userForBody)
                 .patch("?rest_route=/wp/v2/users/%s".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -84,11 +78,8 @@ public class EditUserTest extends BaseTest {
                 .description(newDescription)
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(userForBody)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userForBody)
                 .patch("?rest_route=/wp/v2/users/%s".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -108,11 +99,8 @@ public class EditUserTest extends BaseTest {
                 .name("editingName")
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(userForBody)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userForBody)
                 .patch("?rest_route=/wp/v2/users/%s".formatted(INCORRECT_ID))
                 .then()
                 .log().all()
@@ -134,11 +122,8 @@ public class EditUserTest extends BaseTest {
                 .email(newIncorrectFormatEmail)
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(userForBody)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userForBody)
                 .patch("?rest_route=/wp/v2/users/%s".formatted(user.getId()))
                 .then()
                 .log().all()

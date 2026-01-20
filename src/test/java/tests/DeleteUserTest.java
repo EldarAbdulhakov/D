@@ -36,10 +36,8 @@ public class DeleteUserTest extends BaseTest {
         Assert.assertTrue(userDao.existsByLogin(user.getUsername()));
         Assert.assertTrue(userDao.existsById(user.getId()));
 
-        given()
-                .spec(requestSpecification)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .request()
                 .delete("?rest_route=/wp/v2/users/%s&force=true&reassign=1".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -51,10 +49,8 @@ public class DeleteUserTest extends BaseTest {
 
     @Test
     public void testDeleteUserWithoutForce() {
-        given()
-                .spec(requestSpecification)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .request()
                 .delete("?rest_route=/wp/v2/users/%s&reassign=1".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -68,10 +64,8 @@ public class DeleteUserTest extends BaseTest {
 
     @Test
     public void testDeleteUserWithoutReassign() {
-        given()
-                .spec(requestSpecification)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .request()
                 .delete("?rest_route=/wp/v2/users/%s&force=true".formatted(user.getId()))
                 .then()
                 .log().all()
@@ -85,10 +79,8 @@ public class DeleteUserTest extends BaseTest {
 
     @Test
     public void testDeleteUserWithIncorrectReassign() {
-        given()
-                .spec(requestSpecification)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .request()
                 .delete("?rest_route=/wp/v2/users/%s&force=true&reassign=%s".formatted(user.getId(), INCORRECT_ID))
                 .then()
                 .log().all()
@@ -102,10 +94,8 @@ public class DeleteUserTest extends BaseTest {
 
     @Test
     public void testDeleteNonExistentUser() {
-        given()
-                .spec(requestSpecification)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .request()
                 .delete("?rest_route=/wp/v2/users/%s&force=true&reassign=1".formatted(INCORRECT_ID))
                 .then()
                 .log().all()

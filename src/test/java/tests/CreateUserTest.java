@@ -194,11 +194,8 @@ public class CreateUserTest extends BaseTest {
                 .statusCode(201)
                 .extract().path("id");
 
-        given()
-                .spec(requestSpecification)
-                .body(userWithSameUsername)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userWithSameUsername)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -230,11 +227,8 @@ public class CreateUserTest extends BaseTest {
                 .statusCode(201)
                 .extract().path("id");
 
-        given()
-                .spec(requestSpecification)
-                .body(userWithSameEmail)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(userWithSameEmail)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()

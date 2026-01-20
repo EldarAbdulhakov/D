@@ -19,4 +19,10 @@ public class ApiRequestBuilder {
                 .when()
                 .log().all();
     }
+
+    public RequestSpecification request() {
+        return given()
+                .spec(spec)
+                .log().all();
+    }
 }
