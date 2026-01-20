@@ -10,7 +10,6 @@ import utils.BaseAPIRequests;
 import utils.PropertyProvider;
 
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditFirstName() throws SQLException {
+    public void testEditFirstName() {
         String newFirstName = "editingName";
 
         User userForBody = User.builder()
@@ -53,7 +52,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditEmail() throws SQLException {
+    public void testEditEmail() {
         String newEmail = "editingEmail@gmail.com";
 
         User userForBody = User.builder()
@@ -74,7 +73,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditMultipleFields() throws SQLException {
+    public void testEditMultipleFields() {
         String newFirstName = "editfirstname";
         String newLastName = "editlastname";
         String newDescription = "editdescription";
@@ -101,7 +100,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditNameNonExistentUser() throws SQLException {
+    public void testEditNameNonExistentUser() {
         List<User> usersBefore = userDao.getAllUsers();
         Map<Integer, Map<String, String>> userMetaBefore = userMetaDao.getAllUserMeta();
 
@@ -128,7 +127,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditOnIncorrectFormatEmail() throws SQLException {
+    public void testEditOnIncorrectFormatEmail() {
         String newIncorrectFormatEmail = "editingEmail.com";
 
         User userForBody = User.builder()
@@ -150,7 +149,7 @@ public class EditUserTest extends BaseTest {
     }
 
     @Test
-    public void testEditNameWithoutAdministratorRights() throws SQLException {
+    public void testEditNameWithoutAdministratorRights() {
         List<User> usersBefore = userDao.getAllUsers();
         Map<Integer, Map<String, String>> userMetaBefore = userMetaDao.getAllUserMeta();
 

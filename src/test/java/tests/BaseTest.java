@@ -5,6 +5,7 @@ import dao.UserMetaDao;
 import io.restassured.specification.RequestSpecification;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import utils.ApiRequestBuilder;
 import utils.BaseAPIRequests;
 import utils.DatabaseManager;
 
@@ -17,6 +18,7 @@ public class BaseTest {
     protected UserDao userDao;
     protected UserMetaDao userMetaDao;
     protected RequestSpecification requestSpecification;
+    protected ApiRequestBuilder apiRequestBuilder;
 
     @BeforeClass
     public void setup() throws SQLException {
@@ -24,6 +26,7 @@ public class BaseTest {
         connection = DatabaseManager.getConnection();
         userDao = new UserDao(connection);
         userMetaDao = new UserMetaDao(connection);
+        apiRequestBuilder = new ApiRequestBuilder(requestSpecification);
     }
 
     @AfterClass

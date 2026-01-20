@@ -10,7 +10,6 @@ import utils.BaseAPIRequests;
 import utils.PropertyProvider;
 
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 
 import static io.restassured.RestAssured.given;
 
@@ -33,7 +32,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteUser() throws SQLException {
+    public void testDeleteUser() {
         Assert.assertTrue(userDao.existsByLogin(user.getUsername()));
         Assert.assertTrue(userDao.existsById(user.getId()));
 
@@ -51,7 +50,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteUserWithoutForce() throws SQLException {
+    public void testDeleteUserWithoutForce() {
         given()
                 .spec(requestSpecification)
                 .when()
@@ -68,7 +67,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteUserWithoutReassign() throws SQLException {
+    public void testDeleteUserWithoutReassign() {
         given()
                 .spec(requestSpecification)
                 .when()
@@ -85,7 +84,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteUserWithIncorrectReassign() throws SQLException {
+    public void testDeleteUserWithIncorrectReassign() {
         given()
                 .spec(requestSpecification)
                 .when()
@@ -102,7 +101,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteNonExistentUser() throws SQLException {
+    public void testDeleteNonExistentUser() {
         given()
                 .spec(requestSpecification)
                 .when()
@@ -119,7 +118,7 @@ public class DeleteUserTest extends BaseTest {
     }
 
     @Test
-    public void testDeleteUserWithoutAdministratorRights() throws SQLException {
+    public void testDeleteUserWithoutAdministratorRights() {
         given()
                 .contentType(ContentType.JSON)
                 .baseUri(PropertyProvider.getInstance().getProperty("base.url"))

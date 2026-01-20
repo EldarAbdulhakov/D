@@ -17,110 +17,151 @@ public class UserDao {
         this.connection = connection;
     }
 
-    public User getDbUserById(Integer userId) throws SQLException {
+    public User getDbUserById(Integer userId) {
         String query = "SELECT * FROM wp_users WHERE ID = ?";
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setInt(1, userId);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, userId);
 
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            return mapResultSetToUser(resultSet);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapResultSetToUser(resultSet);
+                }
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
-    public Integer getIdByLogin(String login) throws SQLException {
+    public Integer getIdByLogin(String login) {
         String query = "SELECT ID FROM wp_users WHERE user_login = ?";
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, login);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, login);
 
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            return resultSet.getInt("ID");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("ID");
+                }
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
-    public boolean existsById(Integer id) throws SQLException {
-        String sql = "SELECT 1 FROM wp_users WHERE ID = ? LIMIT 1";
+    public boolean existsById(Integer id) {
+        String query = "SELECT 1 FROM wp_users WHERE ID = ? LIMIT 1";
 
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setInt(1, id);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
 
-        ResultSet resultSet = statement.executeQuery();
-        return resultSet.next();
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public boolean existsByLogin(String login) throws SQLException {
+    public boolean existsByLogin(String login) {
         return getIdByLogin(login) != null;
     }
 
-    public boolean existsByEmail(String email) throws SQLException {
+    public boolean existsByEmail(String email) {
         String query = "SELECT 1 FROM wp_users WHERE user_email = ? LIMIT 1";
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, email);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
 
-        ResultSet resultSet = statement.executeQuery();
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
 
-        return resultSet.next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public int countByLogin(String login) throws SQLException {
+    public int countByLogin(String login) {
         String query = """
                     SELECT COUNT(*)
                     FROM wp_users
                     WHERE user_login = ?
                 """;
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, login);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, login);
 
-        ResultSet resultSet = statement.executeQuery();
-        resultSet.next();
-        return resultSet.getInt(1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+                return 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public int countByEmail(String email) throws SQLException {
+    public int countByEmail(String email) {
         String query = """
                     SELECT COUNT(*)
                     FROM wp_users
                     WHERE user_email = ?
                 """;
 
-        PreparedStatement statement = connection.prepareStatement(query);
-        statement.setString(1, email);
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
 
-        ResultSet resultSet = statement.executeQuery();
-        resultSet.next();
-        return resultSet.getInt(1);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1);
+                }
+                return 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public List<User> getAllUsers() throws SQLException {
+    public List<User> getAllUsers() {
         String sql = "SELECT * FROM wp_users";
         List<User> users = new ArrayList<>();
 
-        PreparedStatement statement = connection.prepareStatement(sql);
-        ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
-        while (resultSet.next()) {
-            users.add(mapResultSetToUser(resultSet));
+            while (resultSet.next()) {
+                users.add(mapResultSetToUser(resultSet));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return users;
     }
 
-    private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        return User.builder()
-                .id(rs.getInt("ID"))
-                .username(rs.getString("user_login"))
-                .email(rs.getString("user_email"))
-                .name(rs.getString("display_name"))
-                .registeredDate(rs.getTimestamp("user_registered").toInstant().toString())
-                .url(rs.getString("user_url"))
-                .slug(rs.getString("user_nicename"))
-                .build();
+    private User mapResultSetToUser(ResultSet rs) {
+        try {
+            return User.builder()
+                    .id(rs.getInt("ID"))
+                    .username(rs.getString("user_login"))
+                    .email(rs.getString("user_email"))
+                    .name(rs.getString("display_name"))
+                    .registeredDate(rs.getTimestamp("user_registered").toInstant().toString())
+                    .url(rs.getString("user_url"))
+                    .slug(rs.getString("user_nicename"))
+                    .build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

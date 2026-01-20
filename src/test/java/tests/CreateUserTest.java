@@ -9,7 +9,6 @@ import utils.BaseAPIRequests;
 import utils.PropertyProvider;
 
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,18 +35,15 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithRequiredFields() throws SQLException {
+    public void testCreateUserWithRequiredFields() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456@gmail.com")
                 .password("Dfgr44!")
                 .build();
 
-        userId = given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        userId = apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -61,7 +57,7 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithAllFields() throws SQLException {
+    public void testCreateUserWithAllFields() {
         Map<String, Object> meta = new HashMap<>();
         Map<String, Object> preferences = new HashMap<>();
         preferences.put("_modified", LocalDateTime.now()
@@ -84,11 +80,8 @@ public class CreateUserTest extends BaseTest {
                 .meta(meta)
                 .build();
 
-        userId = given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        userId = apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -110,17 +103,14 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithoutUsername() throws SQLException {
+    public void testCreateUserWithoutUsername() {
         User user = User.builder()
                 .email("mike456@gmail.com")
                 .password("Dfgr44!")
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -130,17 +120,14 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithoutEmail() throws SQLException {
+    public void testCreateUserWithoutEmail() {
         User user = User.builder()
                 .username("Mike")
                 .password("Dfgr44!")
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -150,17 +137,14 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithoutPassword() throws SQLException {
+    public void testCreateUserWithoutPassword() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456@gmail.com")
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -170,18 +154,15 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserIncorrectFormatEmail() throws SQLException {
+    public void testCreateUserIncorrectFormatEmail() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456.com")
                 .password("Dfgr44!")
                 .build();
 
-        given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -192,7 +173,7 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithExistingUsername() throws SQLException {
+    public void testCreateUserWithExistingUsername() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456@gmail.com")
@@ -205,11 +186,8 @@ public class CreateUserTest extends BaseTest {
                 .password("OOOYYy4521!!!!!")
                 .build();
 
-        userId = given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        userId = apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -231,7 +209,7 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithExistingEmail() throws SQLException {
+    public void testCreateUserWithExistingEmail() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456@gmail.com")
@@ -244,11 +222,8 @@ public class CreateUserTest extends BaseTest {
                 .password("GGGYYy4521!!!!!")
                 .build();
 
-        userId = given()
-                .spec(requestSpecification)
-                .body(user)
-                .when()
-                .log().all()
+        userId = apiRequestBuilder
+                .requestWithBody(user)
                 .post("?rest_route=/wp/v2/users")
                 .then()
                 .log().all()
@@ -270,7 +245,7 @@ public class CreateUserTest extends BaseTest {
     }
 
     @Test
-    public void testCreateUserWithoutAdministratorRights() throws SQLException {
+    public void testCreateUserWithoutAdministratorRights() {
         User user = User.builder()
                 .username("Mike")
                 .email("mike456@gmail.com")
