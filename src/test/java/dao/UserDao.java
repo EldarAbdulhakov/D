@@ -1,11 +1,9 @@
 package dao;
 
 import models.User;
+import utils.DataCleanRegistry;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +42,24 @@ public class UserDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("ID");
+                }
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getNameById(Integer id) {
+        String query = "SELECT display_name FROM wp_users WHERE ID = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("display_name");
                 }
                 return null;
             }
@@ -162,6 +178,66 @@ public class UserDao {
                     .build();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Integer createUser(String username, String email, String password) {
+        String query = """
+                INSERT INTO wp_users (user_login, user_nicename, user_pass, user_email, user_registered, display_name)
+                VALUES (?, ?, MD5(?), ?, NOW(), ?)
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, username);
+            statement.setString(2, username.toLowerCase());
+            statement.setString(3, password);
+            statement.setString(4, email);
+            statement.setString(5, username);
+
+            statement.executeUpdate();
+
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    Integer userId = resultSet.getInt(1);
+                    DataCleanRegistry.addUser(userId);
+
+                    return userId;
+                }
+                return 0;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create user", e);
+        }
+    }
+
+    public List<String> getAllUserNames() {
+        String query = "SELECT display_name FROM wp_users";
+        List<String> names = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                names.add(resultSet.getString("display_name"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return names;
+    }
+
+    public void deleteUser(int userId) {
+        String query = "DELETE FROM wp_users WHERE ID = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, userId);
+            statement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete user", e);
         }
     }
 }
