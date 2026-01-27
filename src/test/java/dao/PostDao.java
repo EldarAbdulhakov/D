@@ -43,6 +43,40 @@ public class PostDao {
         }
     }
 
+    public void createPostWithDateOffset(int userId, String title, String content, String status, int offsetSeconds) {
+        String query = """
+                INSERT INTO wp_posts (post_author, post_date, post_date_gmt, post_content, post_title, post_excerpt,
+                post_status, post_name, post_modified, post_modified_gmt, post_type, to_ping, pinged, post_content_filtered)
+                VALUES (?, DATE_ADD(NOW(), INTERVAL ? SECOND), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? SECOND), ?, ?, '', ?, ?,
+                DATE_ADD(NOW(), INTERVAL ? SECOND), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? SECOND), 'post', '', '', '')
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setInt(1, userId);
+            statement.setInt(2, offsetSeconds);
+            statement.setInt(3, offsetSeconds);
+            statement.setString(4, content);
+            statement.setString(5, title);
+            statement.setString(6, status);
+            statement.setString(7, title.toLowerCase().replace(" ", "-"));
+            statement.setInt(8, offsetSeconds);
+            statement.setInt(9, offsetSeconds);
+
+            statement.executeUpdate();
+
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    Integer postId = resultSet.getInt(1);
+                    DataCleanRegistry.addPost(postId);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create posts", e);
+        }
+    }
+
     public void deletePost(int postId) {
         String query = "DELETE FROM wp_posts WHERE ID = ?";
 
@@ -53,6 +87,18 @@ public class PostDao {
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete post", e);
+        }
+    }
+
+    public void createPosts(int postsCount, int userId, String title, String content, String status) {
+        for (int i = 1; i <= postsCount; i++) {
+            createPost(userId, title + i, content + i, status);
+        }
+    }
+
+    public void createPostsWithDiffDate(int postsCount, int userId, String title, String content, String status) {
+        for (int i = 1; i <= postsCount; i++) {
+            createPostWithDateOffset(userId, title + i, content + i, status, i);
         }
     }
 }

@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.*;
 
 public class GetPostTest extends BaseTest {
@@ -19,11 +18,12 @@ public class GetPostTest extends BaseTest {
     @BeforeMethod
     public void createData() {
         userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
-        postId = postDao.createPost(userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
     }
 
     @Test
     public void testGetAllPosts() {
+        postId = postDao.createPost(userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
+
         apiRequestBuilder
                 .request()
                 .get("?rest_route=/wp/v2/posts")
@@ -39,33 +39,22 @@ public class GetPostTest extends BaseTest {
 
     @Test
     public void testGetLimitedPosts() {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
-        for (int i = 1; i < 7; i++) {
-            postDao.createPost(userId,
-                    "titleForIdUserMike%s".formatted(i),
-                    "contentForIdUserMike%s".formatted(i),
-                    "publish");
-        }
+        int postsByPage = 5;
+        postDao.createPosts(6, userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
 
         apiRequestBuilder
                 .request()
-                .get("?rest_route=/wp/v2/posts&per_page=5")
+                .get("?rest_route=/wp/v2/posts&per_page=%s".formatted(postsByPage))
                 .then()
                 .log().all()
                 .statusCode(200)
-                .body("size()", lessThanOrEqualTo(5));
+                .body("size()", lessThanOrEqualTo(postsByPage));
     }
 
     @Test
     public void testPagination() {
         int postsByPage = 5;
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
-        for (int i = 1; i < 7; i++) {
-            postDao.createPost(userId,
-                    "titleForIdUserMike%s".formatted(i),
-                    "contentForIdUserMike%s".formatted(i),
-                    "publish");
-        }
+        postDao.createPosts(6, userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
 
         apiRequestBuilder
                 .request()
@@ -79,7 +68,6 @@ public class GetPostTest extends BaseTest {
     @Test
     public void testSearchPosts() {
         String searchText = "searchText";
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
         postId = postDao.createPost(
                 userId,
                 "titleForIdUserMike%s".formatted(searchText),
@@ -104,15 +92,8 @@ public class GetPostTest extends BaseTest {
     }
 
     @Test
-    public void testSortPostsAscending() throws InterruptedException {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
-        for (int i = 1; i < 6; i++) {
-            postDao.createPost(userId,
-                    "titleForIdUserMike%s".formatted(i),
-                    "contentForIdUserMike%s".formatted(i),
-                    "publish");
-            sleep(1000);
-        }
+    public void testSortPostsAscending() {
+        postDao.createPostsWithDiffDate(6, userId, "titleDiffDate", "contentDiffDate", "publish");
 
         List<String> dates = apiRequestBuilder
                 .request()
@@ -129,15 +110,8 @@ public class GetPostTest extends BaseTest {
     }
 
     @Test
-    public void testSortPostsDescending() throws InterruptedException {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
-        for (int i = 1; i < 6; i++) {
-            postDao.createPost(userId,
-                    "titleForIdUserMike%s".formatted(i),
-                    "contentForIdUserMike%s".formatted(i),
-                    "publish");
-            sleep(1000);
-        }
+    public void testSortPostsDescending() {
+        postDao.createPostsWithDiffDate(6, userId, "titleDiffDate", "contentDiffDate", "publish");
 
         List<String> dates = apiRequestBuilder
                 .request()
@@ -155,7 +129,6 @@ public class GetPostTest extends BaseTest {
 
     @Test
     public void testGetPostsByAuthor() {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
         postId = postDao.createPost(userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
 
         apiRequestBuilder
@@ -169,7 +142,6 @@ public class GetPostTest extends BaseTest {
 
     @Test
     public void testGetPostById() {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
         postId = postDao.createPost(userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
 
         apiRequestBuilder
@@ -183,7 +155,6 @@ public class GetPostTest extends BaseTest {
 
     @Test
     public void testGetNonExistPost() {
-        userId = userDao.createUser("Mike", "bobs007@mail.com", "dfgdhf12$");
         postId = postDao.createPost(userId, "titleForIdUserMike", "contentForIdUserMike", "publish");
 
         apiRequestBuilder
