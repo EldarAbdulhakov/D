@@ -94,7 +94,7 @@ public class GetPostTest extends BaseTest {
                 contents != null && contents.stream().anyMatch(c -> c.contains(searchText));
 
         Assert.assertTrue(
-                foundInTitle || foundInContent,"searchText not found in title OR content");
+                foundInTitle || foundInContent, "searchText not found in title OR content");
     }
 
     @Test
