@@ -1,5 +1,6 @@
 package tests;
 
+import io.restassured.path.json.JsonPath;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -74,21 +75,26 @@ public class GetPostTest extends BaseTest {
                 "contentForIdUserMike",
                 "publish");
 
-        apiRequestBuilder
+        JsonPath jsonPath = apiRequestBuilder
                 .request()
                 .get("?rest_route=/wp/v2/posts&search=%s".formatted(searchText))
                 .then()
                 .log().all()
                 .statusCode(200)
                 .body("id", hasItem(postId))
-                .body(
-                        "findAll { " +
-                                "it.id == " + postId + " && (" +
-                                "it.title.rendered.toLowerCase().contains('" + searchText.toLowerCase() + "') || " +
-                                "it.content.rendered.toLowerCase().contains('" + searchText.toLowerCase() + "')" +
-                                ") }.size()",
-                        greaterThan(0)
-                );
+                .extract().jsonPath();
+
+        List<String> titles = jsonPath.getList("title.rendered");
+        List<String> contents = jsonPath.getList("content.rendered");
+
+        boolean foundInTitle =
+                titles != null && titles.stream().anyMatch(t -> t.contains(searchText));
+
+        boolean foundInContent =
+                contents != null && contents.stream().anyMatch(c -> c.contains(searchText));
+
+        Assert.assertTrue(
+                foundInTitle || foundInContent,"searchText not found in title OR content");
     }
 
     @Test
